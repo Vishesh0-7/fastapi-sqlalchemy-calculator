@@ -30,15 +30,38 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
+    
+    // Map operation names to the format expected by the API
+    const opMap = {
+      'add': 'Add',
+      'sub': 'Sub', 
+      'mul': 'Multiply',
+      'div': 'Divide'
+    };
+    
     $("go").addEventListener("click", async () => {
-      const params = new URLSearchParams({
-        op: $("op").value,
-        a: $("a").value,
-        b: $("b").value
+      const opValue = $("op").value;
+      const aValue = parseFloat($("a").value);
+      const bValue = parseFloat($("b").value);
+      
+      // Create calculation in database using POST /calculations/
+      const res = await fetch('/calculations/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          a: aValue,
+          b: bValue,
+          type: opMap[opValue]
+        })
       });
-      const res = await fetch(`/calc?${params}`);
+      
       const data = await res.json();
-      $("result").textContent = res.ok ? `Result: ${data.result}` : `Error: ${data.detail}`;
+      
+      if (res.ok) {
+        $("result").textContent = `Result: ${data.result} (Saved to DB with ID: ${data.id})`;
+      } else {
+        $("result").textContent = `Error: ${data.detail}`;
+      }
     });
   </script>
 </body>

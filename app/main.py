@@ -1,9 +1,13 @@
 # app/main.py
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
+from typing import List, Optional
 import logging, time
 from app import operations as ops
+from app import crud, schemas
+from app.database import get_db, Base, engine
 
 # ----- Logging setup -----
 logging.basicConfig(
@@ -13,6 +17,13 @@ logging.basicConfig(
 log = logging.getLogger("calculator")
 
 app = FastAPI(title="FastAPI Calculator", version="1.0.0")
+
+# Create database tables on startup
+@app.on_event("startup")
+def startup_event():
+    """Create database tables if they don't exist."""
+    Base.metadata.create_all(bind=engine)
+    log.info("Database tables created/verified")
 
 # Static UI
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -69,3 +80,66 @@ def calc(op: str, a: float, b: float):
         return {"op": op, "result": funcs[op](a, b)}
     except ZeroDivisionError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+# ========== Database-Backed Calculation Endpoints ==========
+
+@app.post("/calculations/", response_model=schemas.CalculationRead, status_code=201)
+def create_calculation(
+    calculation: schemas.CalculationCreate,
+    user_id: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new calculation and store it in the database.
+    
+    - **a**: First number
+    - **b**: Second number
+    - **type**: Operation type (Add, Sub, Multiply, Divide)
+    - **user_id**: Optional user ID (query parameter)
+    """
+    try:
+        return crud.create_calculation(db, calculation, user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ZeroDivisionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/calculations/", response_model=List[schemas.CalculationRead])
+def list_calculations(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all calculations from the database.
+    
+    - **skip**: Number of records to skip (default: 0)
+    - **limit**: Maximum records to return (default: 100)
+    """
+    return crud.list_calculations(db, skip=skip, limit=limit)
+
+
+@app.get("/calculations/{calculation_id}", response_model=schemas.CalculationRead)
+def get_calculation(calculation_id: int, db: Session = Depends(get_db)):
+    """
+    Get a specific calculation by ID.
+    """
+    calculation = crud.get_calculation(db, calculation_id)
+    if calculation is None:
+        raise HTTPException(status_code=404, detail="Calculation not found")
+    return calculation
+
+
+@app.get("/users/{user_id}/calculations/", response_model=List[schemas.CalculationRead])
+def get_user_calculations(
+    user_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all calculations for a specific user.
+    """
+    return crud.list_user_calculations(db, user_id, skip=skip, limit=limit)

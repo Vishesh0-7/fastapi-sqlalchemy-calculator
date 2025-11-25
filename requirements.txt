@@ -2,7 +2,11 @@ fastapi
 uvicorn[standard]
 httpx
 pytest
+pytest-cov
 pytest-asyncio
 pytest-playwright
 playwright
 aiofiles
+sqlalchemy
+psycopg2-binary
+pydantic

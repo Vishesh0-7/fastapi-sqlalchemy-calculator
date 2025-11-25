@@ -113,3 +113,4 @@ node_modules/
 # Misc
 *.sqlite3
 *.sqlite
+.pytest_cache/
