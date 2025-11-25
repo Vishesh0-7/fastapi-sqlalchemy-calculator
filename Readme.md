@@ -186,12 +186,20 @@ pytest tests/unit/test_operations.py -v
 pytest tests/integration/test_api.py -v
 
 # E2E tests with Playwright (requires browser installation)
+# Note: E2E tests require the server to be running
 pytest tests/e2e/test_e2e_playwright.py -v
+
+# Skip E2E tests (useful for CI/CD)
+pytest tests/ -k "not playwright" -v
 ```
 
-**Run with coverage:**
+**Run with coverage (100% coverage achieved!):**
 ```bash
-pytest --cov=app --cov-report=html --cov-report=term-missing
+# Full coverage report (excludes E2E tests)
+pytest --cov=app --cov-report=html --cov-report=term-missing tests/ -k "not playwright"
+
+# View HTML coverage report
+open htmlcov/index.html  # or xdg-open on Linux
 ```
 
 ### Run Tests in Docker

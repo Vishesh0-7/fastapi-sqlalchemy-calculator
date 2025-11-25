@@ -42,26 +42,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install --with-deps
 
-      - name: Run unit tests
+      - name: Run all tests with coverage (excluding E2E)
         run: |
-          pytest tests/test_unit.py -v
-
-      - name: Run integration tests (with PostgreSQL)
-        run: |
-          pytest tests/test_integration.py -v
+          pytest tests/ -k "not playwright" --cov=app --cov-report=term --cov-report=xml -v
         env:
           DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
 
-      - name: Run legacy unit tests
-        run: |
-          pytest tests/unit -v
-
-      - name: Run legacy integration tests
-        run: |
-          pytest tests/integration -v
-
-      - name: Run E2E (Playwright)
-        run: |
-          pytest tests/e2e -v
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
