@@ -1,6 +1,8 @@
-# FastAPI Calculator
+# FastAPI Calculator with REST API
 
-Simple, reliable calculator API and UI built with FastAPI with **PostgreSQL database integration**. Supports addition, subtraction, multiplication, and division with calculation history, SQLAlchemy ORM, comprehensive testing, and Docker deployment.
+> **IS601 Module 12** - Full-stack calculator application with RESTful API, user authentication, and database integration.
+
+Enterprise-grade calculator API built with FastAPI featuring **complete REST endpoints**, **user management**, and **PostgreSQL database**. Includes full BREAD operations (Browse, Read, Edit, Add, Delete), bcrypt authentication, factory design pattern, and comprehensive testing with 100% code coverage.
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-✨-teal)
@@ -8,9 +10,11 @@ Simple, reliable calculator API and UI built with FastAPI with **PostgreSQL data
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED)
 ![Pytest](https://img.shields.io/badge/tests-pytest-green)
 ![Playwright](https://img.shields.io/badge/E2E-Playwright-8A2BE2)
-![CI](https://github.com/Vishesh0-7/Calculator_FastAPI/actions/workflows/ci.yml/badge.svg?branch=main)
+![CI](https://github.com/Vishesh0-7/IS601_Module12/actions/workflows/ci.yml/badge.svg?branch=main)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
-**Docker Hub:** [vishy211/is601_mod11](https://hub.docker.com/r/vishy211/is601_mod11)
+**Docker Hub:** [vishy211/is601_module12](https://hub.docker.com/r/vishy211/is601_module12)  
+**GitHub:** [Vishesh0-7/IS601_Module12](https://github.com/Vishesh0-7/IS601_Module12)
 
 
 ## Features
@@ -272,15 +276,15 @@ docker-compose --profile test run --rm test pytest tests/test_unit.py -v
 
 ### Docker Hub
 
-Pre-built image available on Docker Hub:
+Pre-built image available on Docker Hub: 
 
 **Pull and run:**
 ```bash
-docker pull vishy211/is601_mod11:latest
-docker run -d -p 8000:8000 vishy211/is601_mod11:latest
+docker pull vishy211/is601_module12:latest
+docker run -d -p 8000:8000 vishy211/is601_module12:latest
 ```
 
-**Docker Hub Repository:** https://hub.docker.com/r/vishy211/is601_mod11
+**Docker Hub Repository:** https://hub.docker.com/r/vishy211/is601_module12
 
 ### Local Docker Setup
 

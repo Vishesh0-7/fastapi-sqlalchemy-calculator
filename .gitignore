@@ -114,3 +114,4 @@ node_modules/
 *.sqlite3
 *.sqlite
 .pytest_cache/
+.env
