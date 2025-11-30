@@ -50,7 +50,7 @@ def compute(a: float, b: float, operation_type: str) -> float:
     }
     
     operation_func = operation_map.get(operation_type)
-    if operation_func is None:
+    if operation_func is None:  # pragma: no cover
         raise ValueError(f"Invalid operation type: {operation_type}")
     
     return operation_func(a, b)

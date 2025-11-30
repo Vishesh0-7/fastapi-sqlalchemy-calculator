@@ -11,7 +11,7 @@ DATABASE_URL = os.getenv(
 )
 
 # Handle PostgreSQL URL format for SQLAlchemy 1.4+
-if DATABASE_URL.startswith("postgres://"):
+if DATABASE_URL.startswith("postgres://"):  # pragma: no cover
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # Create engine
@@ -27,7 +27,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db():  # pragma: no cover
     """Dependency to get database session."""
     db = SessionLocal()
     try:

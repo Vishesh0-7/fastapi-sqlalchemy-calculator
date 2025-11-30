@@ -41,8 +41,7 @@ class Calculation(Base):
         
         # Compute result if not provided
         if result is None:
-            from app.factory import OperationFactory
-            operation = OperationFactory.create(type)
-            self.result = operation.compute(a, b)
+            from app import operations
+            self.result = operations.compute(a, b, type)
         else:
             self.result = result

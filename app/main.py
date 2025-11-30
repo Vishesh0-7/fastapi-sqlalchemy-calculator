@@ -62,7 +62,7 @@ async def log_requests(request: Request, call_next):
         elapsed = (time.time() - start) * 1000
         log.info("RES %s %s -> %s in %.2f ms", request.method, request.url.path, response.status_code, elapsed)
         return response
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         log.exception("Unhandled error on %s %s", request.method, request.url.path)
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 

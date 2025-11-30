@@ -438,12 +438,23 @@ class TestMainApp:
         )
         user = crud.create_user(test_db, user_data)
         
-        # Create calculation with user_id
-        response = client.post(f"/calculations/?user_id={user.id}", json={
-            "a": 10,
-            "b": 2,
-            "type": "Multiply"
+        # Login to get JWT token
+        login_response = client.post("/auth/login", json={
+            "username_or_email": "maintest",
+            "password": "Pass123"
         })
+        assert login_response.status_code == 200
+        token = login_response.json()["access_token"]
+        
+        # Create calculation with JWT token
+        response = client.post("/calculations/", 
+            json={
+                "a": 10,
+                "b": 2,
+                "type": "Multiply"
+            },
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 201
         assert response.json()["user_id"] == user.id
     
