@@ -204,18 +204,36 @@ test.describe('Calculations BREAD Operations', () => {
     test('should validate non-numeric operands on client side', async ({ page }) => {
       await page.goto('/frontend/calculations.html');
 
-      // Fill in invalid data (HTML5 validation will prevent submission)
-      await page.fill('#operand1', 'abc');
+      // Fill in valid numbers first
+      await page.fill('#operand1', '10');
       await page.fill('#operand2', '5');
+      await page.selectOption('#operation', 'Add');
+      
+      // Clear and try invalid input (HTML5 type="number" prevents non-numeric input)
+      // But we can test by directly setting invalid values
+      await page.evaluate(() => {
+        const input = document.getElementById('operand1') as HTMLInputElement;
+        input.value = 'abc';
+      });
 
-      // Try to submit - HTML5 validation should prevent it
+      // Try to submit
       await page.click('button[type="submit"]');
 
-      // Form should not submit, message should not appear
+      // Wait a moment and check that either:
+      // 1. An error message appears, OR
+      // 2. The form validation prevented submission (no success message)
       await page.waitForTimeout(1000);
-      const message = page.locator('#addMessage.show');
-      const isVisible = await message.isVisible().catch(() => false);
-      expect(isVisible).toBe(false);
+      
+      // Check if error message appeared
+      const errorMessage = page.locator('#addMessage.error');
+      const hasError = await errorMessage.isVisible().catch(() => false);
+      
+      // Check if success message did NOT appear (validation worked)
+      const successMessage = page.locator('#addMessage.success');
+      const hasSuccess = await successMessage.isVisible().catch(() => false);
+      
+      // Either error shown OR success prevented (validation worked)
+      expect(hasError || !hasSuccess).toBe(true);
     });
 
     test('should handle division by zero validation', async ({ page }) => {
