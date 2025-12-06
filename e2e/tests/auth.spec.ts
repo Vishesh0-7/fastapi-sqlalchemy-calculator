@@ -39,7 +39,7 @@ test.describe('Authentication', () => {
       expect(token).toMatch(/^[\w-]+\.[\w-]+\.[\w-]+$/); // JWT format check
       
       // Wait for redirect to calculator (root path)
-      await page.waitForURL(/^\/\?*$|^\/$/, { timeout: 3000 });
+      await page.waitForURL('/', { timeout: 3000 });
     });
 
     test('should show client-side validation for short password', async ({ page }) => {
@@ -172,7 +172,7 @@ test.describe('Authentication', () => {
       expect(token).toBeTruthy();
       
       // Wait for redirect to calculator (root path)
-      await page.waitForURL(/^\\/\\?*$|^\\/$/, { timeout: 3000 });
+      await page.waitForURL('/', { timeout: 3000 });
     });
 
     test('should successfully login with username', async ({ page }) => {
