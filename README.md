@@ -75,10 +75,11 @@ calculator--FastApi/
 │   └── 📂 static/
 │       └── index.html            # Calculator web interface
 │
-├── 📂 frontend/                  # Authentication pages
+├── 📂 frontend/                  # Frontend pages
 │   ├── index.html                # Landing page
 │   ├── login.html                # User login page
 │   ├── register.html             # User registration page
+│   ├── calculations.html         # Calculation BREAD interface
 │   └── common.js                 # Shared frontend utilities
 │
 ├── 📂 tests/                     # Python test suite
@@ -197,6 +198,56 @@ pytest tests/unit/ -v
 # Integration tests only
 pytest tests/integration/ -v
 ```
+
+---
+
+## 🌐 Using the Web Interface
+
+### Landing Page
+Navigate to `http://localhost:8000` to access the landing page with options to:
+- Login to existing account
+- Register new account
+- View API documentation
+
+### User Registration
+1. Navigate to `http://localhost:8000/frontend/register.html`
+2. Fill in email, username, and password
+3. Click "Create Account"
+4. You'll be automatically logged in and redirected to the calculator
+
+### User Login
+1. Navigate to `http://localhost:8000/frontend/login.html`
+2. Enter your email/username and password
+3. Click "Sign In"
+4. You'll be redirected to the calculator interface
+
+### Calculator Interface
+**Quick Calculator** (`/static/index.html`):
+- Simple calculator for immediate calculations
+- Operations: Add, Subtract, Multiply, Divide
+- Results displayed instantly
+- All calculations saved to your history
+
+### Calculation History Management
+**Full BREAD Interface** (`/frontend/calculations.html`):
+- **Browse**: View all your past calculations in a table
+- **Add**: Create new calculations with instant feedback
+- **Read**: Click "Edit" to view calculation details
+- **Edit**: Modify operands and operations, results recompute automatically
+- **Delete**: Remove calculations with confirmation prompt
+
+**Features:**
+- ✅ Client-side validation (no page refresh for errors)
+- ✅ Real-time result calculation
+- ✅ Success/error messages with auto-dismiss
+- ✅ Responsive table design
+- ✅ Modal-based editing for better UX
+- ✅ Automatic token management (logout on expiry)
+
+**Navigation:**
+- Calculations Page → Calculator (via "Calculator" button)
+- Calculator → Calculations Page (need to implement link)
+- Any Page → Logout (via "Logout" button)
 
 ---
 

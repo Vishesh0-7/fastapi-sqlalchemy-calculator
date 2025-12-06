@@ -418,13 +418,14 @@ class TestMainApp:
         response = client.get("/calc?op=div&a=10&b=0")
         assert response.status_code == 400
     
-    def test_create_calculation_via_main_endpoint(self, client):
-        """Test creating calculation via main.py endpoint."""
+    def test_create_calculation_via_main_endpoint(self, client, auth_user_and_token):
+        """Test creating calculation via main.py endpoint with authentication."""
+        token = auth_user_and_token["token"]
         response = client.post("/calculations/", json={
             "a": 15,
             "b": 5,
             "type": "Add"
-        })
+        }, headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 201
         assert response.json()["result"] == 20
     
@@ -458,8 +459,9 @@ class TestMainApp:
         assert response.status_code == 201
         assert response.json()["user_id"] == user.id
     
-    def test_create_calculation_valueerror_via_main(self, client):
+    def test_create_calculation_valueerror_via_main(self, client, auth_user_and_token):
         """Test creating calculation with ValueError via main.py endpoint."""
+        token = auth_user_and_token["token"]
         # This would require a scenario where ValueError is raised but not caught by schema
         # Division by zero is caught by schema, so this path may not be reachable
         # We'll try an edge case
@@ -467,97 +469,118 @@ class TestMainApp:
             "a": 10,
             "b": 0,
             "type": "Divide"
-        })
+        }, headers={"Authorization": f"Bearer {token}"})
         # Schema should catch this before CRUD
         assert response.status_code in [400, 422]
     
-    def test_list_calculations_via_main(self, client):
-        """Test listing calculations via main.py endpoint."""
-        response = client.get("/calculations/")
+    def test_list_calculations_via_main(self, client, auth_user_and_token):
+        """Test listing calculations via main.py endpoint with authentication."""
+        token = auth_user_and_token["token"]
+        response = client.get("/calculations/", headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 200
         assert isinstance(response.json(), list)
     
-    def test_get_calculation_by_id_via_main(self, client):
-        """Test getting calculation by ID via main.py endpoint."""
+    def test_get_calculation_by_id_via_main(self, client, auth_user_and_token):
+        """Test getting calculation by ID via main.py endpoint with authentication."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
         # Create first
         create_resp = client.post("/calculations/", json={
             "a": 7,
             "b": 3,
             "type": "Sub"
-        })
+        }, headers=headers)
         calc_id = create_resp.json()["id"]
         
         # Get it
-        response = client.get(f"/calculations/{calc_id}")
+        response = client.get(f"/calculations/{calc_id}", headers=headers)
         assert response.status_code == 200
         assert response.json()["id"] == calc_id
     
-    def test_get_nonexistent_calculation_via_main(self, client):
-        """Test getting non-existent calculation via main.py."""
-        response = client.get("/calculations/99999")
+    def test_get_nonexistent_calculation_via_main(self, client, auth_user_and_token):
+        """Test getting non-existent calculation via main.py with authentication."""
+        token = auth_user_and_token["token"]
+        response = client.get("/calculations/99999", headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 404
     
 
 
 
 class TestCalculationRoutes:
-    """Test calculation CRUD routes."""
+    """Test calculation CRUD routes with authentication."""
     
-    def test_create_calculation(self, client):
-        """Test creating a calculation."""
-        response = client.post("/calculations/", json={
-            "a": 10,
-            "b": 5,
-            "type": "Add"
-        })
+    def test_create_calculation(self, client, auth_user_and_token):
+        """Test creating a calculation with authentication."""
+        token = auth_user_and_token["token"]
+        response = client.post("/calculations/", 
+            json={
+                "a": 10,
+                "b": 5,
+                "type": "Add"
+            },
+            headers={"Authorization": f"Bearer {token}"}
+        )
         
         assert response.status_code == 201
         data = response.json()
         assert data["result"] == 15
         assert "id" in data
+        assert data["user_id"] is not None
     
-    def test_list_calculations(self, client):
-        """Test listing calculations."""
-        # Create some calculations
-        client.post("/calculations/", json={"a": 5, "b": 3, "type": "Add"})
-        client.post("/calculations/", json={"a": 10, "b": 2, "type": "Sub"})
+    def test_list_calculations(self, client, auth_user_and_token):
+        """Test listing calculations with authentication."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
         
-        response = client.get("/calculations/")
+        # Create some calculations
+        client.post("/calculations/", json={"a": 5, "b": 3, "type": "Add"}, headers=headers)
+        client.post("/calculations/", json={"a": 10, "b": 2, "type": "Sub"}, headers=headers)
+        
+        response = client.get("/calculations/", headers=headers)
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
         assert len(data) >= 2
     
-    def test_get_calculation_by_id(self, client):
-        """Test getting specific calculation."""
+    def test_get_calculation_by_id(self, client, auth_user_and_token):
+        """Test getting specific calculation with authentication."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
         # Create calculation
         create_response = client.post("/calculations/", json={
             "a": 7,
             "b": 3,
             "type": "Multiply"
-        })
+        }, headers=headers)
         calc_id = create_response.json()["id"]
         
         # Get it
-        response = client.get(f"/calculations/{calc_id}")
+        response = client.get(f"/calculations/{calc_id}", headers=headers)
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == calc_id
         assert data["result"] == 21
     
-    def test_get_nonexistent_calculation(self, client):
+    def test_get_nonexistent_calculation(self, client, auth_user_and_token):
         """Test getting non-existent calculation returns 404."""
-        response = client.get("/calculations/99999")
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        response = client.get("/calculations/99999", headers=headers)
         assert response.status_code == 404
     
-    def test_update_calculation(self, client):
-        """Test updating a calculation."""
+    def test_update_calculation(self, client, auth_user_and_token):
+        """Test updating a calculation with authentication."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
         # Create
         create_response = client.post("/calculations/", json={
             "a": 10,
             "b": 5,
             "type": "Add"
-        })
+        }, headers=headers)
         calc_id = create_response.json()["id"]
         
         # Update
@@ -565,29 +588,34 @@ class TestCalculationRoutes:
             "a": 10,
             "b": 5,
             "type": "Multiply"
-        })
+        }, headers=headers)
         
         assert response.status_code == 200
         data = response.json()
         assert data["result"] == 50
     
-    def test_update_nonexistent_calculation(self, client):
+    def test_update_nonexistent_calculation(self, client, auth_user_and_token):
         """Test updating non-existent calculation returns 404."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
         response = client.put("/calculations/99999", json={
             "a": 10,
             "b": 5,
             "type": "Add"
-        })
+        }, headers=headers)
         assert response.status_code == 404
     
-    def test_update_calculation_with_error(self, client):
+    def test_update_calculation_with_error(self, client, auth_user_and_token):
         """Test updating calculation with invalid operation."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
         # Create first
         create_response = client.post("/calculations/", json={
             "a": 10,
             "b": 5,
             "type": "Add"
-        })
+        }, headers=headers)
         calc_id = create_response.json()["id"]
         
         # Try to update with division by zero
@@ -595,30 +623,35 @@ class TestCalculationRoutes:
             "a": 10,
             "b": 0,
             "type": "Divide"
-        })
+        }, headers=headers)
         assert response.status_code == 422  # Schema validation
     
-    def test_delete_calculation(self, client):
-        """Test deleting a calculation."""
+    def test_delete_calculation(self, client, auth_user_and_token):
+        """Test deleting a calculation with authentication."""
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        
         # Create
         create_response = client.post("/calculations/", json={
             "a": 8,
             "b": 2,
             "type": "Divide"
-        })
+        }, headers=headers)
         calc_id = create_response.json()["id"]
         
         # Delete
-        response = client.delete(f"/calculations/{calc_id}")
+        response = client.delete(f"/calculations/{calc_id}", headers=headers)
         assert response.status_code == 204
         
         # Verify deleted
-        get_response = client.get(f"/calculations/{calc_id}")
+        get_response = client.get(f"/calculations/{calc_id}", headers=headers)
         assert get_response.status_code == 404
     
-    def test_delete_nonexistent_calculation(self, client):
+    def test_delete_nonexistent_calculation(self, client, auth_user_and_token):
         """Test deleting non-existent calculation returns 404."""
-        response = client.delete("/calculations/99999")
+        token = auth_user_and_token["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        response = client.delete("/calculations/99999", headers=headers)
         assert response.status_code == 404
 
 

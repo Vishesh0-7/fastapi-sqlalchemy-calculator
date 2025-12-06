@@ -1,43 +1,200 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>FastAPI Calculator</title>
+  <title>Calculator - FastAPI Calculator App</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <style>
-    body { font-family: system-ui, Arial; margin: 2rem; }
-    input, select, button { padding: .5rem; margin-right: .5rem; }
-    #result { font-weight: 700; margin-top: 1rem; }
-    .row { margin-bottom: .75rem; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .user-info { font-size: 0.9rem; color: #666; }
-    .logout-btn { padding: .5rem 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    .logout-btn:hover { background: #c82333; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    
+    .header {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      color: #333;
+      font-size: 24px;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .user-info {
+      font-size: 0.9rem;
+      color: #666;
+      margin-right: 10px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s, transform 0.2s;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+    
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .logout-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+    
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .card h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      color: #555;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e8ed;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .calc-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+    
+    .calc-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>FastAPI Calculator</h1>
-    <div>
-      <span class="user-info" id="userInfo"></span>
-      <button class="logout-btn" id="logoutBtn">Logout</button>
+  <div class="container">
+    <div class="header">
+      <h1>🧮 Calculator</h1>
+      <div class="header-actions">
+        <span class="user-info" id="userInfo"></span>
+        <button class="btn btn-secondary" onclick="window.location.href='/frontend/calculations.html'">📊 History</button>
+        <button class="btn logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>Quick Calculator</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="a">First Number</label>
+          <input id="a" type="number" value="10" step="any">
+        </div>
+        <div class="form-group">
+          <label for="b">Second Number</label>
+          <input id="b" type="number" value="5" step="any">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="op">Operation</label>
+        <select id="op">
+          <option value="add">Add (+)</option>
+          <option value="sub">Subtract (−)</option>
+          <option value="mul">Multiply (×)</option>
+          <option value="div">Divide (÷)</option>
+        </select>
+      </div>
+      <button class="calc-btn" id="go">Calculate</button>
+      <div id="result">Result: —</div>
     </div>
   </div>
-  <div class="row">
-    <label>A <input id="a" type="number" value="3" step="any"></label>
-    <label>B <input id="b" type="number" value="2" step="any"></label>
-  </div>
-  <div class="row">
-    <select id="op">
-      <option value="add">add (+)</option>
-      <option value="sub">sub (-)</option>
-      <option value="mul">mul (×)</option>
-      <option value="div">div (÷)</option>
-    </select>
-    <button id="go">Calculate</button>
-  </div>
-  <div id="result">Result: —</div>
-
   <script>
     const $ = (id) => document.getElementById(id);
     
@@ -45,7 +202,7 @@
     const token = localStorage.getItem('access_token');
     if (!token) {
       // Redirect to landing page if not logged in
-      window.location.href = '/';
+      window.location.href = '/frontend/index.html';
     }
     
     // Show user info (you can decode JWT to get username)
@@ -54,9 +211,9 @@
     }
     
     // Logout functionality
-    $("logoutBtn").addEventListener("click", () => {
+    $('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('access_token');
-      window.location.href = '/';
+      window.location.href = '/frontend/index.html';
     });
     
     // Map operation names to the format expected by the API

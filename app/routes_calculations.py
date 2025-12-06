@@ -1,9 +1,10 @@
 """Calculation BREAD (Browse, Read, Edit, Add, Delete) routes."""
-from fastapi import APIRouter, HTTPException, Depends, status, Request
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from app import schemas, crud
+from typing import List
+from app import schemas, crud, models
 from app.database import get_db
+from app.security import get_current_user
 
 router = APIRouter(prefix="/calculations", tags=["calculations"])
 
@@ -12,29 +13,44 @@ router = APIRouter(prefix="/calculations", tags=["calculations"])
 def browse_calculations(
     skip: int = 0,
     limit: int = 100,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Browse all calculations (list with pagination).
+    Browse all calculations for the logged-in user (list with pagination).
     
     - **skip**: Number of records to skip (default: 0)
     - **limit**: Maximum records to return (default: 100)
+    
+    Requires:
+        - Valid JWT token in Authorization header
+    
+    Returns:
+        List of calculations owned by the current user
     """
-    return crud.list_calculations(db, skip=skip, limit=limit)
+    return crud.list_user_calculations(db, user_id=current_user.id, skip=skip, limit=limit)
 
 
 @router.get("/{calculation_id}", response_model=schemas.CalculationRead)
-def read_calculation(calculation_id: int, db: Session = Depends(get_db)):
+def read_calculation(
+    calculation_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Read a specific calculation by ID.
     
     - **calculation_id**: ID of the calculation to retrieve
     
+    Requires:
+        - Valid JWT token in Authorization header
+        - Calculation must belong to the current user
+    
     Raises:
-        404: If calculation not found
+        404: If calculation not found or doesn't belong to user
     """
     calculation = crud.get_calculation(db, calculation_id)
-    if calculation is None:
+    if calculation is None or calculation.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Calculation not found"
@@ -43,9 +59,9 @@ def read_calculation(calculation_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.CalculationRead, status_code=status.HTTP_201_CREATED)
-async def add_calculation(
+def add_calculation(
     calculation: schemas.CalculationCreate,
-    request: Request,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -55,30 +71,18 @@ async def add_calculation(
     - **b**: Second number
     - **type**: Operation type (Add, Sub, Multiply, Divide)
     
-    If authenticated, automatically associates calculation with the logged-in user.
+    Requires:
+        - Valid JWT token in Authorization header
+    
+    Automatically associates calculation with the logged-in user.
     
     Raises:
         400: If validation fails (e.g., division by zero)
+        401: If not authenticated
         422: If invalid operation type
     """
-    # Try to get user from Authorization header
-    from app.security import verify_token
-    
-    user_id = None
     try:
-        # Extract token from Authorization header
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
-            payload = verify_token(token)
-            user_id_str = payload.get("sub")  # JWT standard uses "sub" for subject (user ID)
-            if user_id_str:
-                user_id = int(user_id_str)
-    except:  # pragma: no cover
-        pass
-    
-    try:
-        return crud.create_calculation(db, calculation, user_id)
+        return crud.create_calculation(db, calculation, current_user.id)
     except ValueError as e:  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))  # pragma: no cover
     except ZeroDivisionError as e:  # pragma: no cover
@@ -89,6 +93,7 @@ async def add_calculation(
 def edit_calculation(
     calculation_id: int,
     calculation: schemas.CalculationCreate,
+    current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -101,17 +106,25 @@ def edit_calculation(
     - **b**: New second number
     - **type**: New operation type
     
+    Requires:
+        - Valid JWT token in Authorization header
+        - Calculation must belong to the current user
+    
     Raises:
-        404: If calculation not found
+        404: If calculation not found or doesn't belong to user
+        401: If not authenticated
         400: If validation fails (e.g., division by zero)
     """
+    # Check if calculation exists and belongs to user
+    existing_calc = crud.get_calculation(db, calculation_id)
+    if existing_calc is None or existing_calc.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Calculation not found"
+        )
+    
     try:
         updated_calc = crud.update_calculation(db, calculation_id, calculation)
-        if updated_calc is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Calculation not found"
-            )
         return updated_calc
     except ValueError as e:  # pragma: no cover
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -120,19 +133,31 @@ def edit_calculation(
 
 
 @router.delete("/{calculation_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_calculation(calculation_id: int, db: Session = Depends(get_db)):
+def delete_calculation(
+    calculation_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Delete a calculation by ID.
     
     - **calculation_id**: ID of the calculation to delete
     
+    Requires:
+        - Valid JWT token in Authorization header
+        - Calculation must belong to the current user
+    
     Raises:
-        404: If calculation not found
+        404: If calculation not found or doesn't belong to user
+        401: If not authenticated
     """
-    success = crud.delete_calculation(db, calculation_id)
-    if not success:
+    # Check if calculation exists and belongs to user
+    existing_calc = crud.get_calculation(db, calculation_id)
+    if existing_calc is None or existing_calc.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Calculation not found"
         )
+    
+    crud.delete_calculation(db, calculation_id)
     return None

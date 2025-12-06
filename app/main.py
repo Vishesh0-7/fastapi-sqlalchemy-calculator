@@ -68,8 +68,8 @@ async def log_requests(request: Request, call_next):
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    """Landing page - shows login/register or redirects to calculator if authenticated."""
-    with open("frontend/index.html", "r", encoding="utf-8") as f:
+    """Calculator page - requires authentication."""
+    with open("app/static/index.html", "r", encoding="utf-8") as f:
         return f.read()
 
 @app.get("/health")

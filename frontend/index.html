@@ -45,19 +45,19 @@
         
         .button-group {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin-top: 30px;
         }
         
         .btn {
             flex: 1;
-            padding: 16px 30px;
+            padding: 14px 30px;
             border: none;
             border-radius: 6px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s, transform 0.2s;
             text-decoration: none;
             display: inline-block;
         }
@@ -100,12 +100,31 @@
             color: #667eea;
             font-weight: bold;
             margin-right: 10px;
+            font-size: 16px;
         }
 
         .loading {
             display: none;
             margin-top: 20px;
             color: #667eea;
+            font-size: 14px;
+        }
+        
+        .api-link {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e8ed;
+        }
+        
+        .api-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .api-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -119,6 +138,10 @@
                 <a href="/frontend/login.html" class="btn btn-primary">Sign In</a>
                 <a href="/frontend/register.html" class="btn btn-secondary">Create Account</a>
             </div>
+            
+            <div class="api-link">
+                <a href="/docs" target="_blank">📚 View API Documentation</a>
+            </div>
         </div>
 
         <div id="loadingSection" class="loading">
@@ -128,8 +151,8 @@
         <div class="features">
             <div class="feature">Secure JWT Authentication</div>
             <div class="feature">Save Your Calculation History</div>
-            <div class="feature">Basic & Advanced Operations</div>
-            <div class="feature">Fast and Responsive</div>
+            <div class="feature">BREAD Operations for Calculations</div>
+            <div class="feature">Modern Responsive Interface</div>
         </div>
     </div>
     
@@ -150,7 +173,7 @@
             })
             .then(response => {
                 // Redirect to calculator regardless (health endpoint doesn't need auth)
-                window.location.href = '/static/index.html';
+                window.location.href = '/';
             })
             .catch(error => {
                 // Token might be invalid, clear it and stay on landing page
