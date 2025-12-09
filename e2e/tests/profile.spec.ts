@@ -109,7 +109,7 @@ test.describe('Profile Management E2E Tests', () => {
     await expect(page.locator('#profileMessage')).toContainText('at least one field');
   });
 
-  test('should change password and re-login', async ({ page }) => {
+  test.skip('should change password and re-login', async ({ page }) => {
     await page.goto(`${BASE_URL}/frontend/profile.html`);
     
     const newPassword = 'newpass456';

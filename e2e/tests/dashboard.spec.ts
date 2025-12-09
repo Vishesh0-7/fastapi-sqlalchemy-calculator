@@ -155,7 +155,18 @@ test.describe('Dashboard and Statistics E2E Tests', () => {
     await expect(page.locator('#averageResult')).toContainText('20.00');
   });
 
-  test('should update statistics when new calculations added', async ({ page }) => {
+  test('should update statistics when new calculations added', async ({ page, request }) => {
+    // Delete any existing calculations first
+    const response = await request.get('/calculations/', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const calculations = await response.json();
+    for (const calc of calculations) {
+      await request.delete(`/calculations/${calc.id}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+    }
+    
     // Create initial calculations
     await page.goto(`${BASE_URL}/frontend/calculations.html`);
     
@@ -236,13 +247,15 @@ test.describe('Dashboard and Statistics E2E Tests', () => {
   });
 
   test('should require authentication to view dashboard', async ({ page, context }) => {
-    // Clear cookies (logout)
+    // Clear cookies and localStorage (logout)
     await context.clearCookies();
+    await page.goto(`${BASE_URL}/frontend/dashboard.html`);
+    await page.evaluate(() => localStorage.clear());
     
-    // Try to access dashboard without being logged in
+    // Reload page to trigger auth check
     await page.goto(`${BASE_URL}/frontend/dashboard.html`);
     
     // Should redirect to login page
-    await page.waitForURL('**/frontend/login.html');
+    await page.waitForURL('**/frontend/login.html', { timeout: 10000 });
   });
 });

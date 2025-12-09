@@ -65,7 +65,18 @@ test.describe('New Operations (Power & Modulus) E2E Tests', () => {
     await expect(page.locator('table tbody tr').first()).toContainText('8');
   });
 
-  test('should perform Modulus calculation correctly', async ({ page }) => {
+  test('should perform Modulus calculation correctly', async ({ page, request }) => {
+    // Delete any existing calculations first
+    const response = await request.get('/calculations/', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const calculations = await response.json();
+    for (const calc of calculations) {
+      await request.delete(`/calculations/${calc.id}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+    }
+    
     await page.goto(`${BASE_URL}/frontend/calculations.html`);
     
     // Perform Modulus calculation: 10 % 3 = 1
@@ -203,7 +214,18 @@ test.describe('New Operations (Power & Modulus) E2E Tests', () => {
     await expect(page.locator('table tbody tr').first()).toContainText('2');
   });
 
-  test('should perform all six operation types in sequence', async ({ page }) => {
+  test('should perform all six operation types in sequence', async ({ page, request }) => {
+    // Delete any existing calculations first
+    const response = await request.get('/calculations/', {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const calculations = await response.json();
+    for (const calc of calculations) {
+      await request.delete(`/calculations/${calc.id}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+    }
+    
     await page.goto(`${BASE_URL}/frontend/calculations.html`);
     
     const operations = [
