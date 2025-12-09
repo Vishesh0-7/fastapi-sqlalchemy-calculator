@@ -164,7 +164,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/CICD_Calculator
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_calculator
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
@@ -178,5 +178,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/CICD_Calculator:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/CICD_Calculator:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cicd_calculator:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cicd_calculator:buildcache,mode=max
