@@ -305,10 +305,10 @@
                     // Reset form
                     form.reset();
                     
-                    // Redirect after 2 seconds
+                    // Redirect after brief delay
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
+                        window.location.href = '/frontend/calculations.html';
+                    }, 500);
                 } else {
                     // Handle error
                     let errorMessage = data.detail || 'Registration failed';

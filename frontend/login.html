@@ -220,10 +220,10 @@
                     // Reset form
                     form.reset();
                     
-                    // Redirect after 1 second
+                    // Redirect after brief delay
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1000);
+                        window.location.href = '/frontend/calculations.html';
+                    }, 500);
                 } else {
                     // Handle error
                     errorMessage.textContent = data.detail || 'Login failed. Please check your credentials.';
