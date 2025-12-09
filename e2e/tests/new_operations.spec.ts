@@ -1,15 +1,17 @@
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8000';
-const TEST_USER = {
-  email: `newops_${Date.now()}@example.com`,
-  username: `newopsuser_${Date.now()}`,
-  password: 'testpass123'
-};
 
 test.describe('New Operations (Power & Modulus) E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Register and login
+    // Register and login with unique credentials
+    const timestamp = Date.now() + Math.random();
+    const TEST_USER = {
+      email: `newops_${timestamp}@example.com`,
+      username: `newopsuser_${timestamp}`,
+      password: 'testpass123'
+    };
+    
     await page.goto(`${BASE_URL}/frontend/register.html`);
     await page.fill('input[name="email"]', TEST_USER.email);
     await page.fill('input[name="username"]', TEST_USER.username);

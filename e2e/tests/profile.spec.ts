@@ -1,15 +1,19 @@
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8000';
-const TEST_USER = {
-  email: `test_${Date.now()}@example.com`,
-  username: `testuser_${Date.now()}`,
-  password: 'testpass123'
-};
 
 test.describe('Profile Management E2E Tests', () => {
+  let TEST_USER: { email: string; username: string; password: string };
+  
   test.beforeEach(async ({ page }) => {
-    // Register a new user before each test
+    // Register a new user before each test with unique credentials
+    const timestamp = Date.now() + Math.random();
+    TEST_USER = {
+      email: `profile_${timestamp}@example.com`,
+      username: `profileuser_${timestamp}`,
+      password: 'testpass123'
+    };
+    
     await page.goto(`${BASE_URL}/frontend/register.html`);
     await page.fill('input[name="email"]', TEST_USER.email);
     await page.fill('input[name="username"]', TEST_USER.username);
