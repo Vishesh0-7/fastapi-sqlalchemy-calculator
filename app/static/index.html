@@ -189,6 +189,8 @@
           <option value="sub">Subtract (−)</option>
           <option value="mul">Multiply (×)</option>
           <option value="div">Divide (÷)</option>
+          <option value="power">Power (^)</option>
+          <option value="modulus">Modulus (%)</option>
         </select>
       </div>
       <button class="calc-btn" id="go">Calculate</button>
@@ -221,7 +223,9 @@
       'add': 'Add',
       'sub': 'Sub', 
       'mul': 'Multiply',
-      'div': 'Divide'
+      'div': 'Divide',
+      'power': 'Power',
+      'modulus': 'Modulus'
     };
     
     $("go").addEventListener("click", async () => {

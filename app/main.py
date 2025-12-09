@@ -12,6 +12,8 @@ from app.database import get_db, Base, engine
 from app.routes_users import router as users_router
 from app.routes_calculations import router as calculations_router
 from app.routes_auth import router as auth_router
+from app.routes_profile import router as profile_router
+from app.routes_dashboard import router as dashboard_router
 
 # ----- Logging setup -----
 logging.basicConfig(
@@ -35,6 +37,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(calculations_router)
+app.include_router(profile_router)
+app.include_router(dashboard_router)
 
 # Create database tables on startup
 @app.on_event("startup")

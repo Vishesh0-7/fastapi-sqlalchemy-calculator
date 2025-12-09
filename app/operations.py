@@ -25,6 +25,42 @@ def div(a: float, b: float) -> float:
     log.debug("div(%s, %s)=%s", a, b, res)
     return res
 
+def power(a: float, b: float) -> float:
+    """
+    Raise a to the power of b.
+    
+    Args:
+        a: Base number
+        b: Exponent
+        
+    Returns:
+        a raised to the power of b
+    """
+    res = a ** b
+    log.debug("power(%s, %s)=%s", a, b, res)
+    return res
+
+def modulus(a: float, b: float) -> float:
+    """
+    Calculate the modulus (remainder) of a divided by b.
+    
+    Args:
+        a: Dividend
+        b: Divisor
+        
+    Returns:
+        Remainder of a / b
+        
+    Raises:
+        ZeroDivisionError: If b is zero
+    """
+    if b == 0:
+        log.error("Attempted modulus by zero: modulus(%s, %s)", a, b)
+        raise ZeroDivisionError("Modulus by zero")
+    res = a % b
+    log.debug("modulus(%s, %s)=%s", a, b, res)
+    return res
+
 
 def compute(a: float, b: float, operation_type: str) -> float:
     """
@@ -46,7 +82,9 @@ def compute(a: float, b: float, operation_type: str) -> float:
         "Add": add,
         "Sub": sub,
         "Multiply": mul,
-        "Divide": div
+        "Divide": div,
+        "Power": power,
+        "Modulus": modulus
     }
     
     operation_func = operation_map.get(operation_type)

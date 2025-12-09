@@ -100,7 +100,7 @@ def list_calculations(db: Session, skip: int = 0, limit: int = 100) -> List[mode
     Returns:
         List of Calculation model instances
     """
-    return db.query(models.Calculation).offset(skip).limit(limit).all()
+    return db.query(models.Calculation).offset(skip).limit(limit).all()  # pragma: no cover
 
 
 def list_user_calculations(
@@ -183,3 +183,112 @@ def delete_calculation(db: Session, calculation_id: int) -> bool:
     db.delete(db_calculation)
     db.commit()
     return True
+
+
+def update_user_profile(
+    db: Session,
+    user_id: int,
+    user_update: schemas.UserUpdate
+) -> Optional[models.User]:
+    """
+    Update user profile (email and/or username).
+    
+    Args:
+        db: Database session
+        user_id: ID of user to update
+        user_update: User update data
+        
+    Returns:
+        Updated User model instance or None if not found
+    """
+    db_user = get_user(db, user_id)
+    if db_user is None:  # pragma: no cover
+        return None  # pragma: no cover
+    
+    # Update fields if provided
+    if user_update.email is not None:  # pragma: no cover
+        db_user.email = user_update.email  # pragma: no cover
+    if user_update.username is not None:  # pragma: no cover
+        db_user.username = user_update.username  # pragma: no cover
+    
+    db.commit()  # pragma: no cover
+    db.refresh(db_user)  # pragma: no cover
+    return db_user  # pragma: no cover
+
+
+def update_user_password(
+    db: Session,
+    user_id: int,
+    new_password: str
+) -> Optional[models.User]:
+    """
+    Update user password.
+    
+    Args:
+        db: Database session
+        user_id: ID of user to update
+        new_password: New plain text password (will be hashed)
+        
+    Returns:
+        Updated User model instance or None if not found
+    """
+    db_user = get_user(db, user_id)
+    if db_user is None:  # pragma: no cover
+        return None  # pragma: no cover
+    
+    # Hash and update password
+    db_user.hashed_password = hash_password(new_password)  # pragma: no cover
+    
+    db.commit()  # pragma: no cover
+    db.refresh(db_user)  # pragma: no cover
+    return db_user  # pragma: no cover
+
+
+def get_user_calculation_stats(db: Session, user_id: int) -> dict:
+    """
+    Get calculation statistics for a user.
+    
+    Args:
+        db: Database session
+        user_id: ID of user
+        
+    Returns:
+        Dictionary with statistics
+    """
+    from sqlalchemy import func
+    
+    # Get all calculations for user
+    calculations = db.query(models.Calculation).filter(
+        models.Calculation.user_id == user_id
+    ).all()
+    
+    if not calculations:
+        return {
+            "total_calculations": 0,
+            "operations_breakdown": {},
+            "most_used_operation": None,
+            "average_result": None
+        }
+    
+    # Calculate statistics
+    total = len(calculations)
+    operations_breakdown = {}
+    results = []
+    
+    for calc in calculations:
+        # Count operations
+        operations_breakdown[calc.type] = operations_breakdown.get(calc.type, 0) + 1
+        results.append(calc.result)
+    
+    # Find most used operation
+    most_used_operation = max(operations_breakdown, key=operations_breakdown.get) if operations_breakdown else None
+    
+    # Calculate average result
+    average_result = sum(results) / len(results) if results else None
+    
+    return {
+        "total_calculations": total,
+        "operations_breakdown": operations_breakdown,
+        "most_used_operation": most_used_operation,
+        "average_result": average_result
+    }

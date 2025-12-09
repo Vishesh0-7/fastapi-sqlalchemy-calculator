@@ -6,12 +6,12 @@
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/tests-pytest%20%2B%20playwright-green?logo=pytest)](https://pytest.org/)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?logo=codecov)](https://codecov.io/)
-[![CI/CD](https://github.com/Vishesh0-7/IS601_Module12/actions/workflows/ci.yml/badge.svg)](https://github.com/Vishesh0-7/IS601_Module12/actions)
+[![CI/CD](https://github.com/Vishesh0-7/IS601_Module12/actions/workflows/ci.yml/badge.svg)](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator/actions)
 
 A professional RESTful API built with FastAPI featuring JWT authentication, calculation history tracking, and a modern responsive web interface.
 
 **🔗 Links:**  
-📦 [Docker Hub](https://hub.docker.com/r/vishy211/is601_module12) | 💻 [GitHub Repository](https://github.com/Vishesh0-7/IS601_Module12)
+📦 [Docker Hub](https://hub.docker.com/r/vishy211/is601_module12) | 💻 [GitHub Repository](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator.git)
 
 ---
 
@@ -19,10 +19,24 @@ A professional RESTful API built with FastAPI featuring JWT authentication, calc
 
 ### Core Functionality
 - 🔐 **JWT Authentication** - Secure user registration and login
-- ➕ **Arithmetic Operations** - Add, subtract, multiply, divide with validation
+- ➕ **Extended Arithmetic Operations** - Add, subtract, multiply, divide, power, modulus with validation
 - 📊 **Calculation History** - Track all calculations with user association
+- 👤 **User Profile Management** - Update username, email, and change password
+- 📈 **Dashboard & Analytics** - View calculation statistics and usage patterns
 - 👥 **User Management** - Complete CRUD operations for users
 - 🎨 **Modern Web UI** - Responsive frontend with real-time validation
+
+### New Features (Module 14)
+- 🔢 **Power Operation** - Exponentiation calculations (a^b)
+- ％ **Modulus Operation** - Remainder calculations (a % b)
+- 🔑 **Password Change** - Secure password updates with re-authentication
+- ✏️ **Profile Updates** - Modify username and email with validation
+- 📊 **Usage Dashboard** - Statistics including:
+  - Total calculations count
+  - Operations breakdown with visual bars
+  - Most frequently used operation
+  - Average calculation result
+- 🔄 **Forced Re-login** - After password change for security
 
 ### Technical Excellence
 - ✅ **100% Test Coverage** - Unit, integration, and E2E tests
@@ -30,6 +44,7 @@ A professional RESTful API built with FastAPI featuring JWT authentication, calc
 - 🐳 **Docker Ready** - Full containerization with Docker Compose
 - 📝 **API Documentation** - Auto-generated Swagger/ReDoc docs
 - 🔒 **Security** - Password hashing, JWT tokens, input validation
+- 🗄️ **Database Migrations** - Alembic for version-controlled schema changes
 
 ---
 
@@ -68,10 +83,12 @@ calculator--FastApi/
 │   ├── schemas.py                # Pydantic validation schemas
 │   ├── crud.py                   # Database CRUD operations
 │   ├── security.py               # JWT & password utilities
-│   ├── operations.py             # Calculation business logic
+│   ├── operations.py             # Calculation business logic (6 operations)
 │   ├── routes_auth.py            # Authentication endpoints
 │   ├── routes_calculations.py    # Calculation CRUD endpoints
 │   ├── routes_users.py           # User management endpoints
+│   ├── routes_profile.py         # Profile & password management **NEW**
+│   ├── routes_dashboard.py       # Statistics & analytics **NEW**
 │   └── 📂 static/
 │       └── index.html            # Calculator web interface
 │
@@ -80,7 +97,15 @@ calculator--FastApi/
 │   ├── login.html                # User login page
 │   ├── register.html             # User registration page
 │   ├── calculations.html         # Calculation BREAD interface
+│   ├── profile.html              # Profile management page **NEW**
+│   ├── dashboard.html            # Statistics dashboard **NEW**
 │   └── common.js                 # Shared frontend utilities
+│
+├── 📂 alembic/                   # Database migrations **NEW**
+│   ├── env.py                    # Migration environment
+│   ├── script.py.mako            # Migration template
+│   └── 📂 versions/
+│       └── 001_initial.py        # Initial schema migration
 │
 ├── 📂 tests/                     # Python test suite
 │   ├── conftest.py               # Pytest fixtures & config
@@ -121,8 +146,8 @@ calculator--FastApi/
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/Vishesh0-7/IS601_Module12.git
-cd IS601_Module12
+git clone https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator.git
+cd fastapi-sqlalchemy-calculator
 ```
 
 ### 2️⃣ Set Up Environment Variables
@@ -195,9 +220,51 @@ pytest tests/test_auth.py -v
 # Unit tests only
 pytest tests/unit/ -v
 
+# New operations tests
+pytest tests/unit/test_new_operations.py -v
+pytest tests/unit/test_profile_schemas.py -v
+
 # Integration tests only
 pytest tests/integration/ -v
+
+# New feature integration tests
+pytest tests/integration/test_profile_routes.py -v
+pytest tests/integration/test_dashboard_routes.py -v
+pytest tests/integration/test_new_operations_routes.py -v
+
+# E2E tests
+cd e2e
+npm test tests/auth.spec.ts
+npm test tests/calculations.spec.ts
+npm test tests/profile.spec.ts        # NEW
+npm test tests/dashboard.spec.ts      # NEW
+npm test tests/new_operations.spec.ts # NEW
 ```
+
+### Test Coverage
+
+The project maintains comprehensive test coverage:
+
+**Unit Tests:**
+- ✅ All calculation operations (including Power & Modulus)
+- ✅ Password hashing and verification
+- ✅ Schema validations (profiles, password change)
+- ✅ Statistics calculations
+
+**Integration Tests:**
+- ✅ Profile update routes (username, email)
+- ✅ Password change workflow
+- ✅ Dashboard statistics endpoints
+- ✅ New calculation operations (Power, Modulus)
+- ✅ User isolation and data integrity
+
+**E2E Tests (Playwright):**
+- ✅ Profile viewing and updates
+- ✅ Password change with re-login
+- ✅ Dashboard statistics display
+- ✅ Power and Modulus operations full workflow
+- ✅ Navigation between pages
+- ✅ Client-side validations
 
 ---
 
@@ -245,9 +312,215 @@ Navigate to `http://localhost:8000` to access the landing page with options to:
 - ✅ Automatic token management (logout on expiry)
 
 **Navigation:**
-- Calculations Page → Calculator (via "Calculator" button)
-- Calculator → Calculations Page (need to implement link)
+- Calculations Page → Dashboard/Profile (via header buttons)
+- Dashboard → Calculations/Profile (via navigation)
+- Profile → Calculations/Dashboard (via navigation)
 - Any Page → Logout (via "Logout" button)
+
+---
+
+## 🆕 New Features (Module 14)
+
+### 1. Extended Calculation Operations
+
+#### Power Operation (Exponentiation)
+Calculate a number raised to a power: `a^b`
+
+**Examples:**
+- `2^3 = 8`
+- `10^2 = 100`
+- `5^0 = 1`
+- `2^-2 = 0.25` (negative exponents supported)
+
+**Usage in UI:**
+- Select "Power (^)" from operation dropdown
+- Enter base number in operand 1
+- Enter exponent in operand 2
+
+**API Endpoint:**
+```http
+POST /calculations/
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "a": 2,
+  "b": 8,
+  "type": "Power"
+}
+
+Response: {"result": 256}
+```
+
+#### Modulus Operation (Remainder)
+Calculate the remainder after division: `a % b`
+
+**Examples:**
+- `10 % 3 = 1`
+- `20 % 5 = 0`
+- `17 % 5 = 2`
+
+**Usage in UI:**
+- Select "Modulus (%)" from operation dropdown
+- Enter dividend in operand 1
+- Enter divisor in operand 2
+
+**Validation:**
+- Modulus by zero returns an error
+
+**API Endpoint:**
+```http
+POST /calculations/
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "a": 17,
+  "b": 5,
+  "type": "Modulus"
+}
+
+Response: {"result": 2}
+```
+
+### 2. User Profile Management
+
+Access your profile at `/frontend/profile.html`
+
+#### View Profile Information
+- Current username
+- Current email
+- User ID
+- Account status
+
+#### Update Profile
+**Change Username:**
+```http
+PUT /profile/me
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "new_username"
+}
+```
+
+**Change Email:**
+```http
+PUT /profile/me
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "email": "newemail@example.com"
+}
+```
+
+**Update Both:**
+```http
+PUT /profile/me
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "new_username",
+  "email": "newemail@example.com"
+}
+```
+
+**Features:**
+- ✅ Real-time validation
+- ✅ Duplicate username/email detection
+- ✅ Immediate UI updates after successful change
+- ✅ At least one field must be provided
+
+### 3. Password Change
+
+Secure password update functionality with forced re-login.
+
+**Endpoint:**
+```http
+POST /profile/change-password
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "current_password": "oldpass123",
+  "new_password": "newpass456"
+}
+```
+
+**Security Features:**
+- ✅ Current password verification required
+- ✅ New password must be different from current
+- ✅ Minimum 6 characters validation
+- ✅ Password confirmation in UI
+- ✅ Automatic logout after change
+- ✅ Must re-login with new password
+
+**Validation Rules:**
+1. Current password must be correct
+2. New password ≥ 6 characters
+3. New password ≠ current password
+4. Confirm password must match new password
+
+**Workflow:**
+1. User enters current password
+2. User enters new password (validated client-side)
+3. User confirms new password
+4. Backend verifies current password
+5. Backend hashes and stores new password
+6. User automatically logged out
+7. User must log in with new password
+
+### 4. Dashboard & Statistics
+
+Comprehensive analytics dashboard at `/frontend/dashboard.html`
+
+**Features:**
+- 📊 Visual statistics display
+- 📈 Operations breakdown with progress bars
+- 🎯 Most frequently used operation
+- 📉 Average calculation result
+- 🔢 Total calculations count
+
+**API Endpoint:**
+```http
+GET /dashboard/stats
+Authorization: Bearer <token>
+
+Response:
+{
+  "total_calculations": 42,
+  "operations_breakdown": {
+    "Add": 15,
+    "Multiply": 10,
+    "Divide": 8,
+    "Sub": 5,
+    "Power": 3,
+    "Modulus": 1
+  },
+  "most_used_operation": "Add",
+  "average_result": 127.5
+}
+```
+
+**Dashboard UI Components:**
+
+**Stat Cards:**
+- Total Calculations (highlighted primary card)
+- Most Used Operation
+- Average Result (formatted to 2 decimals)
+
+**Operations Breakdown:**
+- Visual progress bars for each operation type
+- Count displayed on each bar
+- Sorted by frequency (most used first)
+- Dynamic width based on percentage
+
+**Empty State:**
+- Friendly message when no calculations exist
+- Call-to-action button to create first calculation
 
 ---
 
@@ -374,6 +647,77 @@ Content-Type: application/json
 DELETE /users/{id}
 Authorization: Bearer <token>
 ```
+
+---
+
+## 🗄️ Database Migrations (Alembic)
+
+This project uses Alembic for database schema version control.
+
+### Initial Setup
+
+The project includes a pre-configured Alembic setup with an initial migration for the base schema.
+
+```bash
+# View current migration status
+alembic current
+
+# View migration history
+alembic history
+
+# Upgrade to latest version
+alembic upgrade head
+
+# Downgrade one version
+alembic downgrade -1
+```
+
+### Creating New Migrations
+
+When you modify SQLAlchemy models, create a new migration:
+
+```bash
+# Auto-generate migration from model changes
+alembic revision --autogenerate -m "Add new column to users table"
+
+# Create empty migration (for manual changes)
+alembic revision -m "Custom migration"
+
+# Apply the migration
+alembic upgrade head
+```
+
+### Migration Files
+
+Migrations are stored in `alembic/versions/`:
+- `001_initial.py` - Base schema (users & calculations tables)
+- Future migrations will be added here
+
+### Configuration
+
+- **alembic.ini**: Main configuration file
+- **alembic/env.py**: Migration environment setup
+- **alembic/script.py.mako**: Template for new migrations
+
+### Docker and Migrations
+
+When using Docker, migrations can be run inside the container:
+
+```bash
+# Run migrations in Docker
+docker-compose exec app alembic upgrade head
+
+# Check current version in Docker
+docker-compose exec app alembic current
+```
+
+### Best Practices
+
+1. **Always test migrations** on a development database first
+2. **Review auto-generated migrations** before applying
+3. **Add both upgrade and downgrade** functions
+4. **Use descriptive migration messages**
+5. **Don't modify existing migrations** once applied to production
 
 ---
 

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Calculator App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .info-box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box p {
+            color: #475569;
+            margin-bottom: 8px;
+        }
+        
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-box strong {
+            color: #1e293b;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .password-requirements {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fef3c7;
+            border-left: 3px solid #f59e0b;
+            border-radius: 4px;
+        }
+        
+        .password-requirements p {
+            color: #92400e;
+            font-size: 13px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Profile</h1>
+            <div class="header-actions">
+                <a href="/frontend/calculations.html" class="btn btn-secondary">My Calculations</a>
+                <a href="/frontend/dashboard.html" class="btn btn-secondary">Dashboard</a>
+                <button onclick="logout()" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Current Profile Info -->
+            <div class="section">
+                <h2>Current Profile Information</h2>
+                <div class="info-box" id="profileInfo">
+                    <p><strong>Username:</strong> <span id="currentUsername">Loading...</span></p>
+                    <p><strong>Email:</strong> <span id="currentEmail">Loading...</span></p>
+                    <p><strong>User ID:</strong> <span id="currentUserId">Loading...</span></p>
+                </div>
+            </div>
+            
+            <!-- Update Profile Section -->
+            <div class="section">
+                <h2>Update Profile</h2>
+                <div id="profileMessage" class="message"></div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label for="username">New Username (optional)</label>
+                        <input type="text" id="username" name="username" placeholder="Leave blank to keep current">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">New Email (optional)</label>
+                        <input type="email" id="email" name="email" placeholder="Leave blank to keep current">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="resetProfileForm()" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Change Password Section -->
+            <div class="section">
+                <h2>Change Password</h2>
+                <div id="passwordMessage" class="message"></div>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" required>
+                        <div class="password-requirements">
+                            <p>Password must be at least 6 characters and different from current password</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="resetPasswordForm()" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/frontend/common.js"></script>
+    <script>
+        // Check authentication on page load
+        if (!isAuthenticated()) {
+            window.location.href = '/frontend/login.html';
+        }
+        
+        // Load profile data
+        async function loadProfile() {
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/profile/me`);
+                const profile = await handleApiResponse(response);
+                
+                document.getElementById('currentUsername').textContent = profile.username;
+                document.getElementById('currentEmail').textContent = profile.email;
+                document.getElementById('currentUserId').textContent = profile.id;
+            } catch (error) {
+                showMessage('profileMessage', `Error loading profile: ${error.message}`, 'error');
+            }
+        }
+        
+        // Show message helper
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = `message ${type} show`;
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Update profile form handler
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            // Check if at least one field is provided
+            if (!username && !email) {
+                showMessage('profileMessage', 'Please provide at least one field to update', 'error');
+                return;
+            }
+            
+            // Build update object
+            const updateData = {};
+            if (username) updateData.username = username;
+            if (email) updateData.email = email;
+            
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/profile/me`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                const updatedProfile = await handleApiResponse(response);
+                
+                // Update displayed info
+                document.getElementById('currentUsername').textContent = updatedProfile.username;
+                document.getElementById('currentEmail').textContent = updatedProfile.email;
+                
+                showMessage('profileMessage', 'Profile updated successfully!', 'success');
+                resetProfileForm();
+            } catch (error) {
+                showMessage('profileMessage', `Error: ${error.message}`, 'error');
+            }
+        });
+        
+        // Change password form handler
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Client-side validation
+            if (newPassword !== confirmPassword) {
+                showMessage('passwordMessage', 'New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showMessage('passwordMessage', 'New password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            if (currentPassword === newPassword) {
+                showMessage('passwordMessage', 'New password must be different from current password', 'error');
+                return;
+            }
+            
+            try {
+                const response = await authenticatedFetch(`${API_BASE_URL}/profile/change-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+                
+                const result = await handleApiResponse(response);
+                
+                showMessage('passwordMessage', result.message, 'success');
+                resetPasswordForm();
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    logout();
+                }, 2000);
+            } catch (error) {
+                showMessage('passwordMessage', `Error: ${error.message}`, 'error');
+            }
+        });
+        
+        // Reset forms
+        function resetProfileForm() {
+            document.getElementById('profileForm').reset();
+        }
+        
+        function resetPasswordForm() {
+            document.getElementById('passwordForm').reset();
+        }
+        
+        // Load profile on page load
+        loadProfile();
+    </script>
+</body>
+</html>
