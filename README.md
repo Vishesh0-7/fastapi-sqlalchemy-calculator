@@ -6,12 +6,12 @@
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
 [![Tests](https://img.shields.io/badge/tests-pytest%20%2B%20playwright-green?logo=pytest)](https://pytest.org/)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?logo=codecov)](https://codecov.io/)
-[![CI/CD](https://github.com/Vishesh0-7/IS601_Module12/actions/workflows/ci.yml/badge.svg)](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator/actions)
+[![CI/CD](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator/actions)
 
 A professional RESTful API built with FastAPI featuring JWT authentication, calculation history tracking, and a modern responsive web interface.
 
 **🔗 Links:**  
-📦 [Docker Hub](https://hub.docker.com/r/vishy211/is601_module12) | 💻 [GitHub Repository](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator.git)
+📦 [Docker Hub](https://hub.docker.com/r/vishy211/cicd_calculator) | 💻 [GitHub Repository](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator.git)
 
 ---
 
@@ -820,7 +820,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 If you have any questions or issues, please:
-- Open an issue on [GitHub](https://github.com/Vishesh0-7/IS601_Module12/issues)
+- Open an issue on [GitHub](https://github.com/Vishesh0-7/fastapi-sqlalchemy-calculator/issues)
 - Check the [API Documentation](http://localhost:8000/docs)
 - Review the [QUICKSTART Guide](QUICKSTART.md)
 
