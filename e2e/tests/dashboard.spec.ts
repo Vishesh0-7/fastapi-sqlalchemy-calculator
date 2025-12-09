@@ -3,23 +3,37 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8000';
 
 test.describe('Dashboard and Statistics E2E Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    // Register a new user before each test with unique credentials
-    const timestamp = Date.now() + Math.random();
-    const TEST_USER = {
+  let authToken: string;
+  let testUser: { email: string; username: string; password: string };
+
+  test.beforeAll(async ({ request }) => {
+    // Register a test user via API
+    const timestamp = Date.now();
+    testUser = {
       email: `dashboard_${timestamp}@example.com`,
       username: `dashuser_${timestamp}`,
       password: 'testpass123'
     };
-    
-    await page.goto(`${BASE_URL}/frontend/register.html`);
-    await page.fill('input[name="email"]', TEST_USER.email);
-    await page.fill('input[name="username"]', TEST_USER.username);
-    await page.fill('input[name="password"]', TEST_USER.password);
-    await page.click('button[type="submit"]');
-    
-    // Wait for redirect to calculations page
-    await page.waitForURL('**/frontend/calculations.html');
+
+    await request.post('/auth/register', { data: testUser });
+
+    // Login to get token
+    const loginResponse = await request.post('/auth/login', {
+      data: {
+        username_or_email: testUser.username,
+        password: testUser.password
+      }
+    });
+    const loginData = await loginResponse.json();
+    authToken = loginData.access_token;
+  });
+
+  test.beforeEach(async ({ page }) => {
+    // Set token in localStorage before each test
+    await page.goto(`${BASE_URL}/frontend/login.html`);
+    await page.evaluate((token) => {
+      localStorage.setItem('access_token', token);
+    }, authToken);
   });
 
   test('should show empty state when no calculations', async ({ page }) => {
